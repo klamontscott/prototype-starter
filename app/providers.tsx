@@ -7,7 +7,6 @@ import { usePathname, useSearchParams } from "next/navigation";
 
 export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => {
-    console.log("PH key:", process.env.NEXT_PUBLIC_POSTHOG_KEY);
     posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
       api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
       capture_pageview: false, // manual capture below, avoids App Router duplicates

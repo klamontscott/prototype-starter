@@ -7,9 +7,9 @@ Freelance coded prototyping practice. Productized offer: coded, instrumented pro
 Goal: this repo becomes a working template, plus one public flagship demo.
 
 - [x] Create `prototype-starter` repo, mark as template
-- [ ] `.env.example`, `.gitignore` check, `CLAUDE.md`
-- [ ] Scaffold Next.js 15 + TypeScript + Tailwind v4 + Framer Motion
-- [ ] Wire PostHog: pageviews (manual, no autocapture dupes), custom events, session replay
+- [x] `.env.example`, `.gitignore` check, `CLAUDE.md`
+- [x] Scaffold Next.js 15 + TypeScript + Tailwind v4 + Framer Motion
+- [x] Wire PostHog: pageviews (manual, no autocapture dupes), custom events, session replay
 - [ ] Variant switching pattern (URL param → config), reusable across projects
 - [ ] Mock data layer with Faker.js, edge-case-aware seed data
 - [ ] Claude API middleman route (`/api/synthesize` pattern from Thread)
