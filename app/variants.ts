@@ -5,26 +5,30 @@ export interface VariantConfig {
   headline: string;
   ctaLabel: string;
   ctaStyle: string;
+  layout: "list" | "cards" | "table";
 }
 
 export const variants: Record<VariantKey, VariantConfig> = {
   a: {
     name: "Control",
-    headline: "To get started, edit the page.tsx file.",
+    headline: "Research Sessions",
     ctaLabel: "Fire test event",
     ctaStyle: "bg-orange-700 hover:bg-orange-800",
+    layout: "list",
   },
   b: {
-    name: "Direct",
-    headline: "Test your prototype in minutes.",
+    name: "Comfortable",
+    headline: "Your recent sessions",
     ctaLabel: "Start testing",
     ctaStyle: "bg-emerald-700 hover:bg-emerald-800",
+    layout: "cards",
   },
   c: {
-    name: "Playful",
-    headline: "Go ahead. Click the button. You know you want to.",
+    name: "Dense",
+    headline: "Sessions",
     ctaLabel: "Do it",
     ctaStyle: "bg-indigo-700 hover:bg-indigo-800",
+    layout: "table",
   },
 };
 

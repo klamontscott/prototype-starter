@@ -1,79 +1,130 @@
 "use client";
 
-import Image from "next/image";
 import posthog from "posthog-js";
 import { useVariant } from "./useVariant";
+import { sessions, type ResearchSession } from "./data/mock";
+
+function SentimentDot({ sentiment }: { sentiment: ResearchSession["sentiment"] }) {
+  const colors = {
+    positive: "bg-emerald-500",
+    neutral: "bg-zinc-400",
+    negative: "bg-red-500",
+  };
+  return <span className={`inline-block w-2 h-2 rounded-full ${colors[sentiment]}`} />;
+}
+
+function StatusBadge({ status }: { status: ResearchSession["status"] }) {
+  const styles = {
+    completed: "bg-emerald-950 text-emerald-300",
+    in_review: "bg-blue-950 text-blue-300",
+    flagged: "bg-amber-950 text-amber-300",
+  };
+  const labels = { completed: "Completed", in_review: "In review", flagged: "Flagged" };
+  return (
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[status]}`}>
+      {labels[status]}
+    </span>
+  );
+}
+
+function SessionCard({
+  s,
+  onOpen,
+  roomy = false,
+}: {
+  s: ResearchSession;
+  onOpen: (s: ResearchSession) => void;
+  roomy?: boolean;
+}) {
+  return (
+    <button
+      onClick={() => onOpen(s)}
+      className={`w-full text-left bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-xl transition-colors ${
+        roomy ? "px-5 py-5" : "px-4 py-3"
+      }`}
+    >
+      <div className="flex items-center justify-between gap-3">
+        <span className="font-medium truncate">{s.participant}</span>
+        <StatusBadge status={s.status} />
+      </div>
+      <div className="mt-1 flex items-center gap-3 text-xs text-zinc-400">
+        <SentimentDot sentiment={s.sentiment} />
+        <span>{s.durationMin} min</span>
+        <span>{s.timestamp.toLocaleDateString()}</span>
+      </div>
+      {s.summary && (
+        <p className={`mt-1.5 text-sm text-zinc-400 ${roomy ? "" : "line-clamp-1"}`}>
+          {s.summary}
+        </p>
+      )}
+    </button>
+  );
+}
+
+function SessionTable({
+  data,
+  onOpen,
+}: {
+  data: ResearchSession[];
+  onOpen: (s: ResearchSession) => void;
+}) {
+  return (
+    <div className="border border-zinc-800 rounded-xl overflow-hidden">
+      {data.map((s) => (
+        <button
+          key={s.id}
+          onClick={() => onOpen(s)}
+          className="w-full text-left flex items-center gap-4 px-4 py-2 hover:bg-zinc-800 border-b border-zinc-800/60 last:border-b-0 transition-colors"
+        >
+          <SentimentDot sentiment={s.sentiment} />
+          <span className="font-medium truncate flex-1">{s.participant}</span>
+          <span className="text-xs text-zinc-400 w-16 text-right">{s.durationMin} min</span>
+          <span className="text-xs text-zinc-400 w-20 text-right">
+            {s.timestamp.toLocaleDateString()}
+          </span>
+          <StatusBadge status={s.status} />
+        </button>
+      ))}
+    </div>
+  );
+}
 
 export default function Home() {
   const { key, config } = useVariant();
+
+  const openSession = (s: ResearchSession) => {
+    posthog.capture("session_opened", { session_id: s.id, status: s.status });
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <span className="text-xs uppercase tracking-wide text-zinc-400">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
+      <div className="max-w-3xl mx-auto px-6 py-12">
+        <span className="text-xs uppercase tracking-wide text-zinc-500">
           Variant {key.toUpperCase()} · {config.name}
         </span>
-        <button
-          onClick={() => posthog.capture("test_event", { source: "starter_setup" })}
-          className={`rounded px-4 py-2 text-white transition-colors ${config.ctaStyle}`}
-          >
-          {config.ctaLabel}
-        </button>
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            {config.headline}
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+        <h1 className="mt-2 text-2xl font-semibold tracking-tight">{config.headline}</h1>
+        <p className="mt-1 text-sm text-zinc-400">
+          {sessions.length} research sessions from the last 14 days.
+        </p>
+
+        <div className="mt-8">
+          {config.layout === "table" ? (
+            <SessionTable data={sessions} onOpen={openSession} />
+          ) : config.layout === "cards" ? (
+            <div className="grid sm:grid-cols-2 gap-3">
+              {sessions.map((s) => (
+                <SessionCard key={s.id} s={s} onOpen={openSession} roomy />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {sessions.map((s) => (
+                <SessionCard key={s.id} s={s} onOpen={openSession} />
+              ))}
+            </div>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+      </div>
     </div>
   );
 }
