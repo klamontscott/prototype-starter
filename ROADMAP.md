@@ -11,8 +11,8 @@ Goal: this repo becomes a working template, plus one public flagship demo.
 - [x] Scaffold Next.js 15 + TypeScript + Tailwind v4 + Framer Motion
 - [x] Wire PostHog: pageviews (manual, no autocapture dupes), custom events, session replay
 - [x] Variant switching pattern (URL param → config), reusable across projects
-- [ ] Mock data layer with Faker.js, edge-case-aware seed data
-- [ ] Claude API middleman route (`/api/synthesize` pattern from Thread)
+- [x] Mock data layer with Faker.js, edge-case-aware seed data
+- [x] Claude API middleman route (`/api/synthesize` pattern from Thread)
 - [ ] Vercel deploy flow: password-protected previews, custom domain
 - [ ] Handoff doc template (one page: what shipped, how to run the test, where the data lives)
 - [ ] **Flagship demo**: AI product prototype, 3 variants, fully instrumented, public repo, spawned from this template
