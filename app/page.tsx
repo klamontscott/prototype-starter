@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import posthog from "posthog-js";
 import { useVariant } from "./useVariant";
 import { sessions, type ResearchSession } from "./data/mock";
@@ -109,7 +109,7 @@ function DetailPanel({ session, onClose }: { session: ResearchSession; onClose: 
   );
 }
 
-export default function Home() {
+function SessionList() {
   const { key, config } = useVariant();
   const [selected, setSelected] = useState<ResearchSession | null>(null);
 
@@ -142,5 +142,13 @@ export default function Home() {
 
       {selected && <DetailPanel session={selected} onClose={() => setSelected(null)} />}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-stone-100" />}>
+      <SessionList />
+    </Suspense>
   );
 }
